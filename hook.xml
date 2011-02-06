@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hookexport>
+  <hookdata>
+    <config>
+      <hook_name>Link Bot</hook_name>
+      <hook_desc>Scans forums for dead links</hook_desc>
+      <hook_author><![CDATA[nihalz - modified by New Era Cracker &amp; ujcogtha]]></hook_author>
+      <hook_email/>
+      <hook_website/>
+      <hook_update_check/>
+      <hook_requirements><![CDATA[a:4:{s:20:"hook_ipb_version_min";i:0;s:20:"hook_ipb_version_max";i:0;s:20:"hook_php_version_min";s:0:"";s:20:"hook_php_version_max";s:0:"";}]]></hook_requirements>
+      <hook_version_human>2.1 build 17</hook_version_human>
+      <hook_version_long>10000</hook_version_long>
+      <hook_extra_data><![CDATA[a:5:{s:13:"settingGroups";a:1:{s:0:"";s:2:"46";}s:8:"settings";a:0:{}s:7:"display";a:3:{s:8:"settings";s:24:"Setting groups: Link Bot";s:5:"tasks";s:15:"Tasks: Link Bot";s:8:"database";s:41:"ALTER TABLE posts ADD bot_msg varchar(20)";}s:5:"tasks";a:1:{s:0:"";s:2:"34";}s:8:"database";a:1:{s:5:"alter";a:1:{i:0;a:6:{s:9:"altertype";s:3:"add";s:5:"table";s:5:"posts";s:5:"field";s:7:"bot_msg";s:8:"newfield";s:0:"";s:9:"fieldtype";s:11:"varchar(20)";s:7:"default";s:0:"";}}}}]]></hook_extra_data>
+      <hook_key>linkbot_hook</hook_key>
+    </config>
+  </hookdata>
+  <hookfiles>
+    <file>
+      <hook_file_real>linkbotActionOverloader.php</hook_file_real>
+      <hook_type>commandHooks</hook_type>
+      <hook_classname>linkbotActionOverloader</hook_classname>
+      <hook_data><![CDATA[a:8:{s:12:"dataLocation";s:0:"";s:14:"libApplication";s:0:"";s:15:"classToOverload";s:27:"public_forums_forums_topics";s:9:"skinGroup";N;s:12:"skinFunction";N;s:4:"type";N;s:2:"id";N;s:8:"position";N;}]]></hook_data>
+      <hooks_source><![CDATA[<?php
+class linkbotActionOverloader extends (~extends~)
+{
+	public function parsePostRow( $row = array() )
+	{
+		$class_array = parent::parsePostRow( $row );
+		
+		$row = $class_array['row'];
+		
+		if($row['bot_msg'])
+		{
+		    $botmsg = explode(",",$row['bot_msg']);
+		    $date = getdate($botmsg[0]);
+		    $current = getdate();
+		    $display = array('year', 'month', 'day', 'hour', 'minute', 'second');
+		    $p = array('year', 'mon', 'mday', 'hours', 'minutes', 'seconds');
+		    $factor = array(0, 12, 30, 24, 60, 60);
+		
+		    for ($i = 0; $i < 6; $i++) {
+		        if ($i > 0) {
+		            $current[$p[$i]] += $current[$p[$i - 1]] * $factor[$i];
+		            $date[$p[$i]] += $date[$p[$i - 1]] * $factor[$i];
+		        }
+		        if ($current[$p[$i]] - $date[$p[$i]] > 1) {
+		            $value = $current[$p[$i]] - $date[$p[$i]];
+		            if($botmsg[1]>0) {
+						$row['post'] .= "<div style='font-size:90%;font-weight:bold;margin-top:10px;'>" . $botmsg[1] . " dead link(s) found " . $value . " " . $display[$i] . (($value != 1) ? "s" : "") . " ago</div>";
+					}
+		            else
+					{
+						$row['post'] .= "<div style='font-size:90%;font-weight:bold;margin-top:10px;'>Link(s) checked " . $value . " " . $display[$i] . (($value != 1) ? "s" : "") . " ago</div>";
+					}
+		            break;
+		        }
+		    }
+		    unset($date,$current,$display,$p,$factor,$i);
+		}
+		
+		$class_array['row'] = $row;
+		
+		return $class_array;
+	}
+}
+?>]]></hooks_source>
+    </file>
+  </hookfiles>
+  <hookextras_settings>
+    <setting>
+      <conf_is_title>1</conf_is_title>
+      <conf_title_title>Link Bot [nilhaz]</conf_title_title>
+      <conf_title_desc/>
+      <conf_title_noshow>0</conf_title_noshow>
+      <conf_title_keyword>linkbot</conf_title_keyword>
+      <conf_title_app>forums</conf_title_app>
+      <conf_title_tab>Forums</conf_title_tab>
+    </setting>
+    <setting>
+      <conf_id>518</conf_id>
+      <conf_title><![CDATA[Forum&#39;s to scan]]></conf_title>
+      <conf_description><![CDATA[Select the forum's you want the bot to scan]]></conf_description>
+      <conf_group>46</conf_group>
+      <conf_type>multi</conf_type>
+      <conf_key>linkbot_forumids</conf_key>
+      <conf_value/>
+      <conf_default/>
+      <conf_extra>#show_forums#</conf_extra>
+      <conf_evalphp><![CDATA[if ( $save == 1)
+{
+	if ( is_array($_POST['linkbot_forumids']) )
+	{
+		$_POST['linkbot_forumids'] = implode(",",$_POST['linkbot_forumids']);
+	}
+	else
+	{
+		$_POST['linkbot_forumids'] = "";
+	}
+	
+	$key = 'linkbot_forumids';
+}
+if ( $show == 1 )
+{
+    $key='linkbot_forumids[]';
+}]]></conf_evalphp>
+      <conf_protected>0</conf_protected>
+      <conf_position>1</conf_position>
+      <conf_start_group/>
+      <conf_end_group>0</conf_end_group>
+      <conf_add_cache>1</conf_add_cache>
+      <conf_keywords/>
+      <conf_title_keyword>linkbot</conf_title_keyword>
+      <conf_is_title>0</conf_is_title>
+    </setting>
+    <setting>
+      <conf_id>519</conf_id>
+      <conf_title>Trash-Can forum</conf_title>
+      <conf_description>Select the forum to hold topics deleted by the bot</conf_description>
+      <conf_group>46</conf_group>
+      <conf_type>dropdown</conf_type>
+      <conf_key>linkbot_trashcan_id</conf_key>
+      <conf_value/>
+      <conf_default/>
+      <conf_extra>#show_forums#</conf_extra>
+      <conf_evalphp/>
+      <conf_protected>0</conf_protected>
+      <conf_position>2</conf_position>
+      <conf_start_group/>
+      <conf_end_group>0</conf_end_group>
+      <conf_add_cache>1</conf_add_cache>
+      <conf_keywords/>
+      <conf_title_keyword>linkbot</conf_title_keyword>
+      <conf_is_title>0</conf_is_title>
+    </setting>
+    <setting>
+      <conf_id>520</conf_id>
+      <conf_title>Bot Member ID</conf_title>
+      <conf_description>Enter the Member ID of the member which is going to be the bot</conf_description>
+      <conf_group>46</conf_group>
+      <conf_type>input</conf_type>
+      <conf_key>linkbot_member_id</conf_key>
+      <conf_value/>
+      <conf_default>1</conf_default>
+      <conf_extra/>
+      <conf_evalphp/>
+      <conf_protected>0</conf_protected>
+      <conf_position>3</conf_position>
+      <conf_start_group/>
+      <conf_end_group>0</conf_end_group>
+      <conf_add_cache>1</conf_add_cache>
+      <conf_keywords/>
+      <conf_title_keyword>linkbot</conf_title_keyword>
+      <conf_is_title>0</conf_is_title>
+    </setting>
+    <setting>
+      <conf_id>521</conf_id>
+      <conf_title>Bot reply message</conf_title>
+      <conf_description>Enter the reply which the bot will add to a topic with dead links</conf_description>
+      <conf_group>46</conf_group>
+      <conf_type>textarea</conf_type>
+      <conf_key>linkbot_reply_msg</conf_key>
+      <conf_value/>
+      <conf_default>Link checker bot found dead links!</conf_default>
+      <conf_extra/>
+      <conf_evalphp/>
+      <conf_protected>0</conf_protected>
+      <conf_position>4</conf_position>
+      <conf_start_group/>
+      <conf_end_group>0</conf_end_group>
+      <conf_add_cache>1</conf_add_cache>
+      <conf_keywords/>
+      <conf_title_keyword>linkbot</conf_title_keyword>
+      <conf_is_title>0</conf_is_title>
+    </setting>
+    <setting>
+      <conf_id>522</conf_id>
+      <conf_title>Scan only first post?</conf_title>
+      <conf_description>Should the bot check only the first post of a topic or all the posts?</conf_description>
+      <conf_group>46</conf_group>
+      <conf_type>yes_no</conf_type>
+      <conf_key>linkbot_scanfirstpost</conf_key>
+      <conf_value/>
+      <conf_default>1</conf_default>
+      <conf_extra/>
+      <conf_evalphp/>
+      <conf_protected>0</conf_protected>
+      <conf_position>5</conf_position>
+      <conf_start_group/>
+      <conf_end_group>0</conf_end_group>
+      <conf_add_cache>1</conf_add_cache>
+      <conf_keywords/>
+      <conf_title_keyword>linkbot</conf_title_keyword>
+      <conf_is_title>0</conf_is_title>
+    </setting>
+    <setting>
+      <conf_id>523</conf_id>
+      <conf_title>Minimum % of dead links to take action</conf_title>
+      <conf_description>Enter the minimum percentage of dead links above which the action specified below will be taken</conf_description>
+      <conf_group>46</conf_group>
+      <conf_type>input</conf_type>
+      <conf_key>linkbot_threshold</conf_key>
+      <conf_value/>
+      <conf_default>80</conf_default>
+      <conf_extra/>
+      <conf_evalphp/>
+      <conf_protected>0</conf_protected>
+      <conf_position>6</conf_position>
+      <conf_start_group/>
+      <conf_end_group>0</conf_end_group>
+      <conf_add_cache>1</conf_add_cache>
+      <conf_keywords/>
+      <conf_title_keyword>linkbot</conf_title_keyword>
+      <conf_is_title>0</conf_is_title>
+    </setting>
+    <setting>
+      <conf_id>524</conf_id>
+      <conf_title>What to do when dead links are found?</conf_title>
+      <conf_description>If the % of dead links exceed the minimum specified above, what should the bot do?</conf_description>
+      <conf_group>46</conf_group>
+      <conf_type>dropdown</conf_type>
+      <conf_key>linkbot_action</conf_key>
+      <conf_value/>
+      <conf_default>0</conf_default>
+      <conf_extra>0=Nothing&#13;
+1=Delete Post (Move it to Trash forum)&#13;
+2=Report Post</conf_extra>
+      <conf_evalphp/>
+      <conf_protected>0</conf_protected>
+      <conf_position>7</conf_position>
+      <conf_start_group/>
+      <conf_end_group>0</conf_end_group>
+      <conf_add_cache>1</conf_add_cache>
+      <conf_keywords/>
+      <conf_title_keyword>linkbot</conf_title_keyword>
+      <conf_is_title>0</conf_is_title>
+    </setting>
+    <setting>
+      <conf_id>525</conf_id>
+      <conf_title>Hosts to check other than RS and MU</conf_title>
+      <conf_description><![CDATA[Enter other hosts the bot should check for.
+To add a host, enter the hosts domain followed by a "|" (without the quotes) followed by a keyword or phrase which confirms the link is alive.
+IMPORTANT: Each host has to be in a new line.]]></conf_description>
+      <conf_group>46</conf_group>
+      <conf_type>textarea</conf_type>
+      <conf_key>linkbot_filehosts</conf_key>
+      <conf_value/>
+      <conf_default>depositfiles.com|page_download_gateway
+freakshare.net/files|Download
+freakshare.net/folder|f_name
+hotfile.com/dl|arrow_down
+netload.in/datei|dl_first_bg
+megashares.com|Your Passport needs to be reactivated.
+mediafire.com|Share this file:
+sharingmatrix.com/file|Filename:
+uploading.com/files/get|file_id
+zshare.net/download|File Name</conf_default>
+      <conf_extra/>
+      <conf_evalphp/>
+      <conf_protected>0</conf_protected>
+      <conf_position>8</conf_position>
+      <conf_start_group/>
+      <conf_end_group>0</conf_end_group>
+      <conf_add_cache>1</conf_add_cache>
+      <conf_keywords/>
+      <conf_title_keyword>linkbot</conf_title_keyword>
+      <conf_is_title>0</conf_is_title>
+    </setting>
+    <setting>
+      <conf_id>526</conf_id>
+      <conf_title>Post interval(for debugging)</conf_title>
+      <conf_description><![CDATA[The bot logs in a record after it scans every "n" number of posts, in the Log Manager. This can be used for checking if the bot is running.]]></conf_description>
+      <conf_group>46</conf_group>
+      <conf_type>input</conf_type>
+      <conf_key>linkbot_postinterval</conf_key>
+      <conf_value/>
+      <conf_default>500</conf_default>
+      <conf_extra/>
+      <conf_evalphp/>
+      <conf_protected>0</conf_protected>
+      <conf_position>9</conf_position>
+      <conf_start_group/>
+      <conf_end_group>0</conf_end_group>
+      <conf_add_cache>1</conf_add_cache>
+      <conf_keywords/>
+      <conf_title_keyword>linkbot</conf_title_keyword>
+      <conf_is_title>0</conf_is_title>
+    </setting>
+  </hookextras_settings>
+  <hookextras_language/>
+  <hookextras_modules/>
+  <hookextras_help/>
+  <hookextras_templates/>
+  <hookextras_css/>
+  <hookextras_tasks>
+    <tasks>
+      <task_title>Link Bot [nilhaz]</task_title>
+      <task_file>link_bot.php</task_file>
+      <task_week_day>-1</task_week_day>
+      <task_month_day>-1</task_month_day>
+      <task_hour>9</task_hour>
+      <task_minute>0</task_minute>
+      <task_cronkey>2413953d9edd3a68ea30e50c1c975b46</task_cronkey>
+      <task_log>1</task_log>
+      <task_description>Scans forums for dead links</task_description>
+      <task_enabled>1</task_enabled>
+      <task_key/>
+      <task_safemode>0</task_safemode>
+      <task_locked>0</task_locked>
+      <task_application>forums</task_application>
+    </tasks>
+  </hookextras_tasks>
+  <hookextras_database_create/>
+  <hookextras_database_alter>
+    <alter>
+      <altertype>add</altertype>
+      <table>posts</table>
+      <field>bot_msg</field>
+      <newfield/>
+      <fieldtype>varchar(20)</fieldtype>
+      <default/>
+    </alter>
+  </hookextras_database_alter>
+  <hookextras_database_update/>
+  <hookextras_database_insert/>
+</hookexport>

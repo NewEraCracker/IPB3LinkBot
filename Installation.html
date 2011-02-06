@@ -1,0 +1,85 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<meta name="author" content="nihalz" />
+		<meta name="copyright" content="2009 nihalz" />
+		<title>Link Bot v2 for IPB3.1</title>
+		<style type="text/css" media="all" />
+			h3, div, p { margin: 0; padding: 0; }
+			body { background: #021e2c; color: #fff; font-size: 12px; font-family: Verdana, Arial, "Trebuchet MS", "Times New Roman"; width: 810px; margin: auto; }
+			a { color: #FFF; background: transparent; } a:hover { text-decoration: underline; }
+			#header { margin: 20px; text-align: center; color: #f1f1f1; font-size: 22px; border-bottom: 1px solid #222; }
+			#content h3 { font-size: 14px; padding: 0 0 5px 0; margin: 0px 0 5px 0; }
+			#content p,table { margin: 0 0 40px 0; }
+			#content a { color: #FFF; } a:hover { text-decoration: underline; }
+			textarea {font-size: 10px; width: 100%;}
+		</style>
+	</head>
+	<body>
+		<div id="header">nihalz Link Bot v2 for IPB3</div>
+		<div style="text-align:center;">
+			<a href="http://twitter.com/nihalz" style="text-decoration:none"><img src="twitter.png" style="width:64px;height:64px;vertical-align:middle;border:0;"/> Follow me on Twitter for latest updates</a>
+		</div><br/>
+		<div id="content">
+			<p>
+				<b>Version:</b> 2.1 Build 17<br />
+				<b>Requirements:</b> IP.Board 3.1.3 or higher<br />
+				<b>Author:</b> nihalz<br />
+				<b>Modified:</b> by NewEraCracker & ujcogtha<br />
+				<b>Description:</b> Scans specified forums for dead links from specified file hosts. Adds a reply and moves the topic to the appropriate forum if required.
+			</p>
+			
+			<h3>New in 2.1</h3>
+			<p>
+				-Added an option to report the post<br/>
+				-Other minor fixes
+			</p>
+			
+			<h3>Fresh Installation Instructions</h3>
+			
+			<h3>Important</h3>
+			<p>
+				When you run the bot for the very first time, it will check if a certain column exists in your 'posts' table. If it doesn't, then it will automatically add the column. However, it may take sometime to do that if your database is huge. So I recommend you take your board offline at the first run.<br />Also, if you have used my previous bots for IPB2, then UNDO all the database edits before proceeding.
+			</p>		
+
+			<h3>Step 1: Upload Required Files</h3>
+				<table class="tableborder" style="width: 100%;" align="center" cellpadding="5" cellspacing="0">
+			        <tbody>
+			          <tr>
+			            <td class="pformstrip" style="text-align: center;font-weight:bold;" width="50%"> File</td>
+			            <td class="pformstrip" style="text-align: center;font-weight:bold;" width="50%"> Upload To</td>
+			          </tr>
+			          <tr>
+			            <td class="tdrow1" align="center" width="50%">/upload/admin/applications/forums/tasks/link_bot.php</td>
+			            <td class="tdrow1" align="center" width="50%">/admin/applications/forums/tasks/</td>
+			          </tr>
+						<tr>
+			            <td class="tdrow1" align="center" width="50%">/upload/admin/applications/forums/tasks/mscookie</td>
+			            <td class="tdrow1" align="center" width="50%">/admin/applications/forums/tasks/</td>
+			          </tr>
+			        </tbody>
+			     </table>
+			     
+			<h3>Step 2: Import Hook</h3>
+			<p>
+				Open the Admin CP > System Tab > Manage Hooks. Scroll down to the 'Install a New Hook' section, browse and select the hook.xml file included with these instructions, then click the Install button.
+			</p>
+			
+			<h3>Step 3: Configure Bot and Task</h3>
+			<p>
+				Open the Admin CP > System Tab > Tools & Settings > System Settings. Click on the 'Forums' tab and then click 'Link Bot [nihalz]'. You can configure various settings for the bot here.<br />
+				Open the Admin CP > System Tab > System > System Scheduler. Click on the 'Forums' tab. You will see a task named 'Link Bot [nihalz]'. You can configure the frequency of the bot here and also disable it.
+			</p>
+			
+			<h3>Notes</h3>
+			<p>
+				The bot logs it's actions at certain events along with some statistics. You can view them in the 'Logs' section in Admin CP > System Tab > Tools & Settings > Logs > Scheduler Logs<br/><br/>
+				If the bot scans a post which is not the first post of the topic, and it finds dead links in it, it will 'Unapprove' the post.
+				On the other hand, if it is the first post of the topic, it will move the topic to the specified forum; provided 'Auto Deletion' is enabled. <br/><br/>
+				The bot checks RS links from a post in a single batch. From my testing, I have concluded that if you have more than 140 RS links in a single post, Rapidshare's servers will reject the request and the links won't be checked.
+			</p>
+						
+		</div>
+	</body>
+</html>
